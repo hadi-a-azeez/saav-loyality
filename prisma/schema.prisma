@@ -7,8 +7,24 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model users {
-    id     Int    @id
-    name   String
-    points Int    @default(0)
+model stores{
+        id      Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    name       String
+    address    String
+    phone      String
+    email      String
+    password   String
+    users      users?
+}
+
+//users table with store_id reference to stores table, store_id is the foreign key in users table
+//name, phone
+model users{
+    id         Int      @id @default(autoincrement()) 
+    created_at DateTime @default(now())
+    name       String
+    phone      String
+    stores   stores?  @relation(fields: [store_id], references: [id])
+    store_id   Int?     @unique
 }
