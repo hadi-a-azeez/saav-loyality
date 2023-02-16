@@ -6,6 +6,7 @@ import { api } from "../utils/api";
 
 const Home: NextPage = () => {
   const { data, isLoading } = api.coupons.getAll.useQuery();
+  const { data: stores } = api.stores.getAll.useQuery();
 
   return (
     <>

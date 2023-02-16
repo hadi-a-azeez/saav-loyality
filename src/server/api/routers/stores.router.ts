@@ -1,13 +1,16 @@
+import { z } from "zod";
+import { prisma } from "../../db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const storesRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.stores.findMany();
+    const stores = await prisma.stores.findMany();
+    return stores;
   }),
-  getOne: publicProcedure.query(({ ctx, input }) => {
-    return ctx.prisma.stores.findUnique({
+  getOne: publicProcedure.input(z.number()).query(({ ctx, input }) => {
+    return prisma.stores.findUnique({
       where: {
-        id: input.id,
+        id: input,
       },
     });
   }),
