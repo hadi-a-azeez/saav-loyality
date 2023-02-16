@@ -5,7 +5,7 @@ import Link from "next/link";
 import { api } from "../utils/api";
 
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const { data } = api.users.getAll.useQuery();
 
   return (
     <>
@@ -44,7 +44,7 @@ const Home: NextPage = () => {
             </Link>
           </div>
           <p className="text-2xl text-white">
-            {hello.data ? hello.data.greeting : "Loading tRPC query..."}
+            {data?.map((user) => user.name).join(", ")}
           </p>
         </div>
       </main>
