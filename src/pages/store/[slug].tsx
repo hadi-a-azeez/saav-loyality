@@ -1,27 +1,13 @@
 // this is a page that for stores, take the slug and get the store from the database
-
-import { GetStaticProps, GetStaticPaths } from "next";
-
+import HomeContainer from "../../containers/User/store";
 import { api } from "../../utils/api";
 
-const Store = ({ store }) => {
-  return (
-    <div>
-      <h1>{store.name}</h1>
-    </div>
-  );
+const Store = () => {
+  //pass the data to the container with the types
+  const { data, isLoading } = api.stores.getOne.useQuery(1);
+
+  if (isLoading) return <div>Loading...</div>;
+  return <HomeContainer data={data} isLoading={isLoading} />;
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const store = await api.store.findUnique({
-    where: {
-      slug: params.slug,
-    },
-  });
-
-  return {
-    props: {
-      store,
-    },
-  };
-};
+export default Store;

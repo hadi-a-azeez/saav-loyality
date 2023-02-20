@@ -53,7 +53,7 @@ export const createTRPCContext = (_opts: CreateNextContextOptions) => {
  * This is where the tRPC API is initialized, connecting the context and
  * transformer.
  */
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
@@ -84,4 +84,21 @@ export const createTRPCRouter = t.router;
  * tRPC API. It does not guarantee that a user querying is authorized, but you
  * can still access user session data if they are logged in.
  */
+
+const isAuthed = t.middleware(({ next, ctx }) => {
+  const token = true;
+  if (!token) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+    });
+  }
+  return next({
+    ctx: {
+      // Infers the `session` as non-nullable
+      session: "",
+    },
+  });
+});
+
 export const publicProcedure = t.procedure;
+export const privateProcedure = t.procedure.use(isAuthed);
