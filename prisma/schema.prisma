@@ -5,6 +5,7 @@ generator client {
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
 }
 
 model stores{
@@ -15,12 +16,12 @@ model stores{
     phone      String
     email      String
     password   String
-    users      users?
+    users      loyalty_users?
 }
 
 //users table with store_id reference to stores table, store_id is the foreign key in users table
 //name, phone
-model users{
+model loyalty_users{
     id         Int      @id @default(autoincrement()) 
     created_at DateTime @default(now())
     name       String
