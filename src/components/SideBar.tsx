@@ -13,25 +13,45 @@ const SideBarRoutes = [
   },
   {
     id: 2,
+    name: "My Store",
+    path: "/admin/mystore",
+    icon: "/assets/icons/myStore.svg",
+  },
+  {
+    id: 3,
     name: "Customers",
     path: "/admin/customers",
     icon: "/assets/icons/customers.svg",
   },
   {
-    id: 3,
+    id: 4,
     name: "Coupons",
     path: "/admin/coupons",
     icon: "/assets/icons/coupons.svg",
   },
   {
-    id: 4,
-    name: "Products",
-    path: "/admin/products",
-  },
-  {
     id: 5,
     name: "Reviews",
     path: "/admin/reviews",
+    icon: "/assets/icons/review.svg",
+  },
+  {
+    id: 6,
+    name: "Walk Outs",
+    path: "/admin/walkouts",
+    icon: "/assets/icons/walkoutIcon.svg",
+  },
+  {
+    id: 7,
+    name: "Billing",
+    path: "/admin/billing",
+    icon: "/assets/icons/billing.svg",
+  },
+  {
+    id: 8,
+    name: "Products",
+    path: "/admin/products",
+    icon: "/assets/icons/products.svg",
   },
 ];
 
@@ -63,7 +83,7 @@ const SideBar = ({ selected = "dashboard" }: SideBarProps) => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center bg-white px-4 py-10 text-gray-800">
+    <div className="sticky flex w-full flex-col items-center bg-white px-4 py-10 text-gray-800">
       <h1 className="text-2xl font-semibold">Saav</h1>
       <div className="mt-6 flex w-full flex-col gap-3 px-4">
         {SideBarRoutes.map((item) => (

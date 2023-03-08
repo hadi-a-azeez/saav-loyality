@@ -1,6 +1,9 @@
 import AdminLayout from "@/layouts/admin";
 import { List } from "antd";
 import CustomerCard, { CustomerCardProps } from "./customerCard";
+import CustomerDetailedModal from "./DetailedModal";
+import Header from "./Header";
+import { useCustomer } from "./useCustomer";
 
 const DummyCustomerCard: CustomerCardProps[] = [
   {
@@ -22,15 +25,17 @@ const DummyCustomerCard: CustomerCardProps[] = [
 ];
 
 const CustomersContainer = () => {
+  const { setCustomerDetailsModalVisible } = useCustomer();
   return (
     <AdminLayout page="Customers">
-      <div className="flex w-full flex-col px-6 py-8">
+      <div className="flex w-full flex-col gap-6 px-6 py-8">
+        <Header />
         <List
-          grid={{ gutter: 16, column: 3 }}
+          grid={{ gutter: 1, column: 3 }}
           dataSource={DummyCustomerCard}
-          // pagination
+          // set pagination to bottom of the list, 100vh is the height of the page
           pagination={{
-            pageSize: 1,
+            pageSize: 14,
             total: DummyCustomerCard.length,
             showSizeChanger: false,
             showTotal: (total) => `Total ${total} items`,
@@ -38,12 +43,18 @@ const CustomersContainer = () => {
             align: "center",
           }}
           renderItem={(item) => (
-            <List.Item>
+            <List.Item
+              onClick={() => {
+                console.log("clicked");
+                setCustomerDetailsModalVisible(true);
+              }}
+            >
               <CustomerCard {...item} />
             </List.Item>
           )}
         />
       </div>
+      <CustomerDetailedModal />
     </AdminLayout>
   );
 };

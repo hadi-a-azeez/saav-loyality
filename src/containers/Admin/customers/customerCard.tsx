@@ -1,3 +1,5 @@
+import { Dropdown, MenuProps } from "antd";
+
 export interface CustomerCardProps {
   name: string;
   age: number;
@@ -6,6 +8,25 @@ export interface CustomerCardProps {
   pointsEarned: number;
   walkedOut: number;
 }
+
+const items: MenuProps["items"] = [
+  {
+    label: "View Profile",
+    key: 1,
+  },
+  {
+    label: "View Orders",
+    key: 2,
+  },
+  {
+    label: "View Walkouts",
+    key: 3,
+  },
+  {
+    label: "Delete Customer",
+    key: 4,
+  },
+];
 
 const CustomerCard = ({
   name,
@@ -33,26 +54,39 @@ const CustomerCard = ({
               </p>
             </div>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/icons/options.svg" alt="options" />
+          <Dropdown
+            menu={{ items }}
+            trigger={["click"]}
+            // event propagation is stopped to prevent the modal from closing when the dropdown is clicked
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/icons/options.svg"
+              alt="options"
+              className="cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            />
+          </Dropdown>
         </div>
         {/* customer  interaction details */}
-        <div className="mt-8 grid grid-cols-2 gap-x-2 gap-y-3 text-xs font-bold xl:text-sm">
-          <div className="flex gap-2">
-            <p>Total Purchase: </p>
-            <p>{totalPurchase}</p>
+        <div className="mt-8 grid grid-cols-2 gap-x-2 gap-y-3 text-xs font-medium xl:text-sm">
+          <div className="flex flex-col gap-1">
+            <p className="text-gray-500">Total Purchase</p>
+            <p className="text-base font-semibold">{totalPurchase}</p>
           </div>
-          <div className="flex gap-2">
-            <p>Total Value: </p>
-            <p>₹{totalValue}</p>
+          <div className="flex flex-col gap-1">
+            <p className="text-gray-500">Total value</p>
+            <p className="text-base font-semibold">₹{totalValue}</p>
           </div>
-          <div className="flex gap-2">
-            <p className="text-[#54b627]">Points Earned: </p>
-            <p>{pointsEarned}</p>
+          <div className="flex flex-col gap-1">
+            <p className="text-gray-500">Points earned</p>
+            <p className="text-base font-semibold text-green">{pointsEarned}</p>
           </div>
-          <div className="flex gap-2">
-            <p className="text-red-400">Walked Out: </p>
-            <p>{walkedOut}</p>
+          <div className="flex flex-col gap-1">
+            <p className="text-gray-500">Walked Out</p>
+            <p className="text-base font-semibold">{walkedOut}</p>
           </div>
         </div>
       </div>
