@@ -8,7 +8,10 @@ export default class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          <Script type="text/javascript" src="/auth.js"></Script>
+          <Script
+            type="text/javascript"
+            src="https://otpless.com/auth.js"
+          ></Script>
         </Head>
         <body>
           <Main />

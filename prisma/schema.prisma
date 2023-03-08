@@ -5,7 +5,6 @@ generator client {
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
 }
 
 model stores{
@@ -16,11 +15,20 @@ model stores{
     phone      String
     email      String
     password   String
-    users      loyalty_users?
+    store_name String
+    store_logo String
+    store_banner String
+    store_url String
+    store_instagram String
+    store_contact String
+    store_saav_url String
+    loyalty_users      loyalty_users?
+    coupons coupons?
+    orders orders?
+    points points?
+    walkouts walkouts?
+    text_reviews text_reviews?
 }
-
-//users table with store_id reference to stores table, store_id is the foreign key in users table
-//name, phone
 model loyalty_users{
     id         Int      @id @default(autoincrement()) 
     created_at DateTime @default(now())
@@ -28,4 +36,88 @@ model loyalty_users{
     phone      String
     stores   stores?  @relation(fields: [store_id], references: [id])
     store_id   Int?     @unique
+    orders orders?
+    points points?
+    walkouts walkouts?
+    text_reviews text_reviews?
+}
+
+model coupon_occassions {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    name       String
+    description String
+    coupons coupons?
+    points points?
+}
+
+model coupons {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    start_date DateTime
+    end_date   DateTime
+    coupon_occassions coupon_occassions? @relation(fields: [coupon_occassions_id], references: [id])
+    coupon_occassions_id Int? @unique
+    stores stores? @relation(fields: [store_id], references: [id])
+    store_id Int? @unique
+}
+
+model orders {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    order_date DateTime
+    order_number String
+    payment_status String
+    payment_method String
+    number_of_items Int
+    points Int
+    total_amount Float
+    loyalty_users_id Int @unique
+    loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
+    store_id Int @unique
+    store stores? @relation(fields: [store_id], references: [id])
+}
+
+model points {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    points     Int
+    loyalty_users_id Int @unique
+    loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
+    occassions_id Int @unique
+    occassions coupon_occassions? @relation(fields: [occassions_id], references: [id])
+    store_id Int @unique
+    store stores? @relation(fields: [store_id], references: [id])
+}
+
+model walkout_reasons {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    name       String
+    description String
+    walkouts walkouts?
+}
+
+model walkouts {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    date       DateTime
+    walkout_reasons walkout_reasons? @relation(fields: [walkout_reasons_id], references: [id])
+    walkout_reasons_id Int? @unique
+    remarks    String
+    loyalty_users_id Int @unique
+    loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
+    store_id Int @unique
+    store stores? @relation(fields: [store_id], references: [id])
+}
+
+model text_reviews {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    review     String
+    stars      Int
+    loyalty_users_id Int @unique
+    loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
+    store_id Int @unique
+    store stores? @relation(fields: [store_id], references: [id])
 }

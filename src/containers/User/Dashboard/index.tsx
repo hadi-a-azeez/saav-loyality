@@ -1,6 +1,7 @@
 import ImageReview from "@/components/Reviews/ImageReview";
 import TextReview from "@/components/Reviews/TextReview";
 import UserLayout from "@/layouts/user";
+import { useEffect } from "react";
 import UserCards, { userCardsProps } from "./userCards";
 
 const DummyUserCards: userCardsProps[] = [
