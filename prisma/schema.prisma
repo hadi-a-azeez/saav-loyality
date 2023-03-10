@@ -105,8 +105,8 @@ model walkouts {
     walkout_reasons walkout_reasons? @relation(fields: [walkout_reasons_id], references: [id])
     walkout_reasons_id Int? @unique
     remarks    String
-    loyalty_users_id Int @unique
-    loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
+    loyalty_user_id Int @unique
+    loyalty_users loyalty_users? @relation(fields: [loyalty_user_id], references: [id])
     store_id Int @unique
     store stores? @relation(fields: [store_id], references: [id])
 }

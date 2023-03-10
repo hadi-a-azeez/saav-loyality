@@ -4,6 +4,7 @@ import CustomerCard, { CustomerCardProps } from "./customerCard";
 import CustomerDetailedModal from "./DetailedModal";
 import Header from "./Header";
 import { useCustomer } from "./useCustomer";
+import { api } from "@/utils/api";
 
 const DummyCustomerCard: CustomerCardProps[] = [
   {
@@ -26,6 +27,10 @@ const DummyCustomerCard: CustomerCardProps[] = [
 
 const CustomersContainer = () => {
   const { setCustomerDetailsModalVisible } = useCustomer();
+  // trpc query to get all customers
+  const { data, isLoading } = api.customers.getAll.useQuery();
+  console.log(data);
+
   return (
     <AdminLayout page="Customers">
       <div className="flex w-full flex-col gap-6 px-6 py-8">
