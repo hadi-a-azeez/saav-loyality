@@ -5,6 +5,8 @@ import CustomerDetailedModal from "./DetailedModal";
 import Header from "./Header";
 import { useCustomer } from "./useCustomer";
 import { api } from "@/utils/api";
+import AddCustomerDrawer from "./AddCustomerDrawer";
+import LoadingContainer from "@/components/LoadingContainer";
 
 const DummyCustomerCard: CustomerCardProps[] = [
   {
@@ -26,40 +28,47 @@ const DummyCustomerCard: CustomerCardProps[] = [
 ];
 
 const CustomersContainer = () => {
-  const { setCustomerDetailsModalVisible } = useCustomer();
+  const { setCustomerDetailsModalVisible, setCustomerDetails, searchText } =
+    useCustomer();
   // trpc query to get all customers
-  const { data, isLoading } = api.customers.getAll.useQuery();
-  console.log(data);
+  const { data, isLoading } = api.customers.getAll.useQuery({
+    search: searchText,
+  });
 
   return (
     <AdminLayout page="Customers">
       <div className="flex w-full flex-col gap-6 px-6 py-8">
         <Header />
-        <List
-          grid={{ gutter: 1, column: 3 }}
-          dataSource={DummyCustomerCard}
-          // set pagination to bottom of the list, 100vh is the height of the page
-          pagination={{
-            pageSize: 14,
-            total: DummyCustomerCard.length,
-            showSizeChanger: false,
-            showTotal: (total) => `Total ${total} items`,
-            position: "bottom",
-            align: "center",
-          }}
-          renderItem={(item) => (
-            <List.Item
-              onClick={() => {
-                console.log("clicked");
-                setCustomerDetailsModalVisible(true);
-              }}
-            >
-              <CustomerCard {...item} />
-            </List.Item>
-          )}
-        />
+        {isLoading ? (
+          <LoadingContainer />
+        ) : (
+          <List
+            grid={{ gutter: 1, column: 3 }}
+            dataSource={data}
+            // set pagination to bottom of the list, 100vh is the height of the page
+            pagination={{
+              pageSize: 14,
+              total: DummyCustomerCard.length,
+              showSizeChanger: false,
+              showTotal: (total) => `Total ${total} items`,
+              position: "bottom",
+              align: "center",
+            }}
+            renderItem={(item) => (
+              <List.Item
+                onClick={() => {
+                  setCustomerDetails(item);
+                  setCustomerDetailsModalVisible(true);
+                }}
+              >
+                <CustomerCard data={item} />
+              </List.Item>
+            )}
+          />
+        )}
       </div>
       <CustomerDetailedModal />
+      <AddCustomerDrawer />
     </AdminLayout>
   );
 };

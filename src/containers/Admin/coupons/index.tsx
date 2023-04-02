@@ -1,4 +1,5 @@
 import AdminLayout from "@/layouts/admin";
+import { api } from "@/utils/api";
 import { useState } from "react";
 import MetricsCard, { MetricsCardProps } from "../dashboard/MetricsCard";
 import AddTriggerDrawer from "./AddTriggerDrawer";
@@ -62,6 +63,9 @@ const CouponsContainer = () => {
     useState(false);
   const [isEditRedeemDrawerVisible, setIsEditRedeemDrawerVisible] =
     useState(false);
+  const { data: allCoupons, isLoading } = api.coupons.getAllCoupons.useQuery();
+  const { data: storePoints } = api.coupons.getStorePointsSystem.useQuery();
+
   return (
     <AdminLayout page="Coupons">
       <div className="flex w-full flex-col px-6 py-8">
@@ -80,7 +84,7 @@ const CouponsContainer = () => {
           </button>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4">
-          {DummyTriggers.map((trigger, index) => (
+          {(allCoupons || []).map((trigger, index) => (
             <TriggerCard key={index} {...trigger} />
           ))}
         </div>
@@ -96,10 +100,11 @@ const CouponsContainer = () => {
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div className="flex flex-col justify-between gap-3 rounded-lg bg-white py-7 px-5 shadow-metricsCard">
             <h1 className="text-lg font-semibold">
-              100 points is ₹100 off on next order
+              {storePoints?.points} points is ₹{storePoints?.rupees} off on next
+              order
             </h1>
             <p className="text-sm font-normal text-gray-500">
-              Minimum order value of ₹500
+              Minimum order value of ₹{storePoints?.minimum_order_amount}
             </p>
             {/* Why this is good for retention */}
             <div className="w-fit rounded-lg bg-gray-100 px-5 py-4 text-sm font-normal text-gray-900">

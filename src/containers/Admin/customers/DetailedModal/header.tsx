@@ -1,14 +1,22 @@
+import { useCustomer } from "../useCustomer";
+
 const Header = () => {
+  const { customerDetails } = useCustomer();
+  const age = customerDetails?.dob
+    ? new Date().getFullYear() - new Date(customerDetails?.dob).getFullYear()
+    : 0;
   return (
     <header className="border-b border-gray-200">
       <div className="my-6 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black">
-            <p className="text-lg text-white">M</p>
+            <p className="text-lg text-white">
+              {customerDetails?.name.charAt(0).toLocaleUpperCase()}
+            </p>
           </div>
           <div className="flex flex-col gap-1">
-            <p className="text-lg font-medium">Marques</p>
-            <p className="text-sm text-gray-500">20 years old</p>
+            <p className="text-lg font-medium">{customerDetails?.name}</p>
+            <p className="text-sm text-gray-500">{age} years old</p>
           </div>
         </div>
         <div className="flex items-center justify-end gap-3">

@@ -11,35 +11,39 @@ model stores{
         id      Int      @id @default(autoincrement())
     created_at DateTime @default(now())
     name       String
-    address    String
+    address    String?
     phone      String
-    email      String
+    email      String?
     password   String
     store_name String
-    store_logo String
-    store_banner String
+    store_logo String?
+    store_banner String?
     store_url String
-    store_instagram String
+    store_instagram String?
     store_contact String
-    store_saav_url String
-    loyalty_users      loyalty_users?
-    coupons coupons?
-    orders orders?
-    points points?
-    walkouts walkouts?
-    text_reviews text_reviews?
+    store_saav_url String?
+    loyalty_users      loyalty_users[]
+    coupons coupons[]
+    orders orders[]
+    points points_history[]
+    walkouts walkouts[]
+    text_reviews text_reviews[]
+    user_points user_points?
+    store_points_system store_points_system?
 }
 model loyalty_users{
     id         Int      @id @default(autoincrement()) 
     created_at DateTime @default(now())
     name       String
     phone      String
+    dob        DateTime
     stores   stores?  @relation(fields: [store_id], references: [id])
-    store_id   Int?     @unique
-    orders orders?
-    points points?
-    walkouts walkouts?
-    text_reviews text_reviews?
+    store_id   Int?     
+    orders orders[]
+    points points_history[]
+    walkouts walkouts[]
+    text_reviews text_reviews[]
+    users_points user_points[]
 }
 
 model coupon_occassions {
@@ -47,8 +51,8 @@ model coupon_occassions {
     created_at DateTime @default(now())
     name       String
     description String
-    coupons coupons?
-    points points?
+    coupons coupons[]
+    points points_history[]
 }
 
 model coupons {
@@ -57,9 +61,16 @@ model coupons {
     start_date DateTime
     end_date   DateTime
     coupon_occassions coupon_occassions? @relation(fields: [coupon_occassions_id], references: [id])
-    coupon_occassions_id Int? @unique
+    coupon_occassions_id Int? 
     stores stores? @relation(fields: [store_id], references: [id])
-    store_id Int? @unique
+    store_id Int? 
+    status enum_coupon_status
+    points Int
+}
+
+enum enum_coupon_status {
+    active
+    inactive
 }
 
 model orders {
@@ -72,20 +83,29 @@ model orders {
     number_of_items Int
     points Int
     total_amount Float
-    loyalty_users_id Int @unique
+    loyalty_users_id Int 
     loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
-    store_id Int @unique
+    store_id Int 
     store stores? @relation(fields: [store_id], references: [id])
 }
 
-model points {
+model points_history {
     id         Int      @id @default(autoincrement())
     created_at DateTime @default(now())
     points     Int
-    loyalty_users_id Int @unique
+    loyalty_users_id Int 
     loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
-    occassions_id Int @unique
+    occassions_id Int 
     occassions coupon_occassions? @relation(fields: [occassions_id], references: [id])
+    store_id Int 
+    store stores? @relation(fields: [store_id], references: [id])
+}
+
+model user_points {
+    id         Int      @id @default(autoincrement())
+    points     Int
+    loyalty_users_id Int 
+    loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
     store_id Int @unique
     store stores? @relation(fields: [store_id], references: [id])
 }
@@ -95,7 +115,7 @@ model walkout_reasons {
     created_at DateTime @default(now())
     name       String
     description String
-    walkouts walkouts?
+    walkouts walkouts[]
 }
 
 model walkouts {
@@ -103,11 +123,11 @@ model walkouts {
     created_at DateTime @default(now())
     date       DateTime
     walkout_reasons walkout_reasons? @relation(fields: [walkout_reasons_id], references: [id])
-    walkout_reasons_id Int? @unique
-    remarks    String
-    loyalty_user_id Int @unique
+    walkout_reasons_id Int
+    remarks    String?
+    loyalty_user_id Int?
     loyalty_users loyalty_users? @relation(fields: [loyalty_user_id], references: [id])
-    store_id Int @unique
+    store_id Int 
     store stores? @relation(fields: [store_id], references: [id])
 }
 
@@ -116,8 +136,18 @@ model text_reviews {
     created_at DateTime @default(now())
     review     String
     stars      Int
-    loyalty_users_id Int @unique
+    loyalty_users_id Int 
     loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
+    store_id Int 
+    store stores? @relation(fields: [store_id], references: [id])
+}
+
+model store_points_system {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    points     Int
+    rupees    Float
+    minimum_order_amount Float
     store_id Int @unique
     store stores? @relation(fields: [store_id], references: [id])
 }

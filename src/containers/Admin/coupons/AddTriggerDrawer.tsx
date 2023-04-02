@@ -1,11 +1,42 @@
-import { Button, Drawer, Form, Input, DatePicker, Select } from "antd";
+import { api } from "@/utils/api";
+import {
+  Button,
+  Drawer,
+  Form,
+  Input,
+  DatePicker,
+  Select,
+  Row,
+  Space,
+  Switch,
+  message,
+} from "antd";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
 }
 
+interface FormValues {
+  occassion_id: number;
+  points: string;
+  start_date: string;
+  end_date: string;
+  status: boolean;
+}
+
 const AddTriggerDrawer = ({ visible, onClose }: Props) => {
+  const { data, isLoading } = api.coupons.getAllOccassions.useQuery();
+  const addTriggerMutation = api.coupons.addCoupon.useMutation({
+    onSuccess: () => {
+      void message.success("Trigger added successfully");
+      onClose();
+    },
+    onError: (error) => {
+      void message.error(error.message);
+    },
+  });
+
   return (
     <Drawer
       title="Add Trigger"
@@ -14,31 +45,63 @@ const AddTriggerDrawer = ({ visible, onClose }: Props) => {
       onClose={onClose}
       open={visible}
     >
-      <Form name="basic" layout="vertical">
+      <Form
+        name="basic"
+        layout="vertical"
+        onFinish={(values: FormValues) => {
+          addTriggerMutation.mutate({
+            ...values,
+            start_date: new Date(values.start_date).toISOString(),
+            end_date: new Date(values.end_date).toISOString(),
+          });
+        }}
+      >
         <Form.Item
           label="Occassion"
-          name="occassion"
+          name="occassion_id"
           rules={[{ required: true, message: "Please input your name!" }]}
         >
           <Select size="large">
-            <Select.Option value="first_order">First Order</Select.Option>
-            <Select.Option value="sign_up">Sign Up</Select.Option>
-            <Select.Option value="refer_a_friend">Refer a friend</Select.Option>
+            {data?.map((occassion) => (
+              <Select.Option value={occassion.id} key={occassion.id}>
+                {occassion.name}
+              </Select.Option>
+            ))}
           </Select>
         </Form.Item>
         <Form.Item
           label="Points"
-          name="number"
-          rules={[
-            { required: true, message: "Please input your phone number!" },
-          ]}
+          name="points"
+          rules={[{ required: true, message: "Please enter point" }]}
         >
-          <Input />
+          <Input size="large" />
         </Form.Item>
-        <Form.Item label="Expiry date" name="expiry">
-          <DatePicker />
+        <Space>
+          <Form.Item label="Start date" name="start_date">
+            <DatePicker size="large" />
+          </Form.Item>
+          <Form.Item label="Expiry date" name="end_date">
+            <DatePicker size="large" />
+          </Form.Item>
+        </Space>
+        <Form.Item
+          label="Status"
+          name="status"
+          rules={[{ required: true, message: "Please select status" }]}
+        >
+          <Switch
+            checkedChildren="Active"
+            unCheckedChildren="Inactive"
+            defaultChecked
+          />
         </Form.Item>
-        <Button htmlType="submit">Add</Button>
+        <Button
+          htmlType="submit"
+          size="large"
+          loading={addTriggerMutation.isLoading}
+        >
+          Add Trigger
+        </Button>
       </Form>
     </Drawer>
   );

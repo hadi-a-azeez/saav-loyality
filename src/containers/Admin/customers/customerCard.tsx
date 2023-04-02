@@ -1,4 +1,7 @@
 import { Dropdown, MenuProps } from "antd";
+import { RouterOutputs } from "@/utils/api";
+import { useMemo } from "react";
+import { useCustomer } from "./useCustomer";
 
 export interface CustomerCardProps {
   name: string;
@@ -8,6 +11,9 @@ export interface CustomerCardProps {
   pointsEarned: number;
   walkedOut: number;
 }
+
+type ICustomerCardProps = RouterOutputs["customers"]["getAll"][0];
+export type IOrders = RouterOutputs["customers"]["getAll"][0]["orders"][0];
 
 const items: MenuProps["items"] = [
   {
@@ -28,14 +34,25 @@ const items: MenuProps["items"] = [
   },
 ];
 
-const CustomerCard = ({
-  name,
-  age,
-  totalPurchase,
-  totalValue,
-  pointsEarned,
-  walkedOut,
-}: CustomerCardProps) => {
+const CustomerCard = ({ data }: { data: ICustomerCardProps | undefined }) => {
+  const { setCustomerDetails } = useCustomer();
+  setCustomerDetails(data);
+  const customerData = useMemo(() => {
+    return {
+      totalOrders: Array.isArray(data?.orders) ? data?.orders?.length : 0,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+      totalValue: data?.orders?.reduce(
+        (acc: number, curr: IOrders) => acc + curr.total_amount,
+        0
+      ),
+      totalWalkouts: Array.isArray(data?.walkouts) ? data?.walkouts?.length : 0,
+      points: data?.users_points[0]?.points || 0,
+      age: data?.dob
+        ? new Date().getFullYear() - new Date(data?.dob).getFullYear()
+        : 0,
+    };
+  }, [data]);
+
   return (
     <div className="rounded-2xl bg-white p-6">
       <div>
@@ -48,9 +65,9 @@ const CustomerCard = ({
               className="h-14 w-14 rounded-full"
             />
             <div className="flex flex-col items-start gap-1">
-              <p className="text-base font-semibold">{name}</p>
+              <p className="text-base font-semibold">{data?.name}</p>
               <p className="text-sm font-medium text-gray-600">
-                {age} years old
+                {customerData?.age} years old
               </p>
             </div>
           </div>
@@ -74,19 +91,27 @@ const CustomerCard = ({
         <div className="mt-8 grid grid-cols-2 gap-x-2 gap-y-3 text-xs font-medium xl:text-sm">
           <div className="flex flex-col gap-1">
             <p className="text-gray-500">Total Purchase</p>
-            <p className="text-base font-semibold">{totalPurchase}</p>
+            <p className="text-base font-semibold">
+              {customerData.totalOrders}
+            </p>
           </div>
           <div className="flex flex-col gap-1">
             <p className="text-gray-500">Total value</p>
-            <p className="text-base font-semibold">₹{totalValue}</p>
+            <p className="text-base font-semibold">
+              ₹{customerData.totalValue}
+            </p>
           </div>
           <div className="flex flex-col gap-1">
             <p className="text-gray-500">Points earned</p>
-            <p className="text-base font-semibold text-green">{pointsEarned}</p>
+            <p className="text-base font-semibold text-green">
+              {customerData.points}
+            </p>
           </div>
           <div className="flex flex-col gap-1">
             <p className="text-gray-500">Walked Out</p>
-            <p className="text-base font-semibold">{walkedOut}</p>
+            <p className="text-base font-semibold">
+              {customerData.totalWalkouts}
+            </p>
           </div>
         </div>
       </div>

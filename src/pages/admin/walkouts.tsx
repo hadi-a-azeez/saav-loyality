@@ -1,7 +1,12 @@
 import WalkOutsContainer from "@/containers/Admin/walkouts";
+import { WalkoutsContextProvider } from "@/containers/Admin/walkouts/useWalkouts";
 
 const WalkOuts = () => {
-  return <WalkOutsContainer />;
+  return (
+    <WalkoutsContextProvider>
+      <WalkOutsContainer />
+    </WalkoutsContextProvider>
+  );
 };
 
 export default WalkOuts;

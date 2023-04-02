@@ -96,7 +96,7 @@ const isAuthed = t.middleware(({ next, ctx }) => {
     ctx: {
       // Infers the `session` as non-nullable
       session: "",
-      user: "kardano",
+      user: 1,
     },
   });
 });
