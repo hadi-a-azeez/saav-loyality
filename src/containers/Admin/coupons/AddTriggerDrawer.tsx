@@ -11,6 +11,7 @@ import {
   Switch,
   message,
 } from "antd";
+import { useState } from "react";
 
 interface Props {
   visible: boolean;
@@ -26,6 +27,7 @@ interface FormValues {
 }
 
 const AddTriggerDrawer = ({ visible, onClose }: Props) => {
+  const [occassionId, setOccassionId] = useState<number>(0);
   const { data, isLoading } = api.coupons.getAllOccassions.useQuery();
   const addTriggerMutation = api.coupons.addCoupon.useMutation({
     onSuccess: () => {
@@ -61,7 +63,12 @@ const AddTriggerDrawer = ({ visible, onClose }: Props) => {
           name="occassion_id"
           rules={[{ required: true, message: "Please input your name!" }]}
         >
-          <Select size="large">
+          <Select
+            size="large"
+            onChange={(value) => {
+              setOccassionId(value as number);
+            }}
+          >
             {data?.map((occassion) => (
               <Select.Option value={occassion.id} key={occassion.id}>
                 {occassion.name}
@@ -76,6 +83,15 @@ const AddTriggerDrawer = ({ visible, onClose }: Props) => {
         >
           <Input size="large" />
         </Form.Item>
+        {occassionId === 2 && (
+          <Form.Item
+            label="Rupees"
+            name="rupees"
+            rules={[{ required: true, message: "Please enter rupees" }]}
+          >
+            <Input size="large" />
+          </Form.Item>
+        )}
         <Space>
           <Form.Item label="Start date" name="start_date">
             <DatePicker size="large" />

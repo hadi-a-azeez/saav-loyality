@@ -7,6 +7,7 @@ export const couponsRouter = createTRPCRouter({
     const occassions = await prisma.coupon_occassions.findMany();
     return occassions;
   }),
+  // get all coupons
   getAllCoupons: privateProcedure.query(async ({ ctx }) => {
     const coupons = await prisma.coupons.findMany({
       where: {
@@ -14,10 +15,12 @@ export const couponsRouter = createTRPCRouter({
       },
       include: {
         coupon_occassions: true,
+        store_orders_coupons: true,
       },
     });
     return coupons;
   }),
+  // add coupon
   addCoupon: privateProcedure
     .input(
       z.object({
@@ -26,6 +29,7 @@ export const couponsRouter = createTRPCRouter({
         start_date: z.string(),
         end_date: z.string(),
         status: z.boolean(),
+        rupees: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -39,6 +43,17 @@ export const couponsRouter = createTRPCRouter({
           store_id: ctx.user,
         },
       });
+      // adding rupees data to store_orders_coupon table if occassion is orders
+      if (input.occassion_id === 2) {
+        await prisma.store_orders_coupon.create({
+          data: {
+            store_id: ctx.user,
+            coupon_id: coupon.id,
+            rupees: Number(input.rupees),
+            points: Number(input.points),
+          },
+        });
+      }
       return coupon;
     }),
   // update coupon status
@@ -60,7 +75,7 @@ export const couponsRouter = createTRPCRouter({
       });
       return coupon;
     }),
-    // get store points system
+  // get store points system
   getStorePointsSystem: privateProcedure.query(async ({ ctx }) => {
     const store = await prisma.store_points_system.findUnique({
       where: {

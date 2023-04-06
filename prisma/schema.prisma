@@ -30,6 +30,8 @@ model stores{
     text_reviews text_reviews[]
     user_points user_points?
     store_points_system store_points_system?
+    bills bills[]
+    store_orders_coupons store_orders_coupon[]
 }
 model loyalty_users{
     id         Int      @id @default(autoincrement()) 
@@ -44,6 +46,7 @@ model loyalty_users{
     walkouts walkouts[]
     text_reviews text_reviews[]
     users_points user_points[]
+    bills bills[]
 }
 
 model coupon_occassions {
@@ -66,11 +69,23 @@ model coupons {
     store_id Int? 
     status enum_coupon_status
     points Int
+    store_orders_coupons store_orders_coupon[]
 }
 
 enum enum_coupon_status {
     active
     inactive
+}
+
+model store_orders_coupon {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    store_id Int
+    store stores? @relation(fields: [store_id], references: [id])
+    coupon_id Int
+    coupons coupons? @relation(fields: [coupon_id], references: [id])
+    points Int
+    rupees Float
 }
 
 model orders {
@@ -93,12 +108,18 @@ model points_history {
     id         Int      @id @default(autoincrement())
     created_at DateTime @default(now())
     points     Int
+    transaction_type enum_transaction_type
     loyalty_users_id Int 
     loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
     occassions_id Int 
     occassions coupon_occassions? @relation(fields: [occassions_id], references: [id])
     store_id Int 
     store stores? @relation(fields: [store_id], references: [id])
+}
+
+enum enum_transaction_type {
+    earned
+    redeemed
 }
 
 model user_points {
@@ -150,4 +171,26 @@ model store_points_system {
     minimum_order_amount Float
     store_id Int @unique
     store stores? @relation(fields: [store_id], references: [id])
+}
+
+model bills {
+    id         Int      @id @default(autoincrement())
+    created_at DateTime @default(now())
+    bill_date DateTime
+    bill_amount Float
+    discounted_amount Float
+    payment_method enum_payment_method
+    number_of_items Int
+    loyalty_users_id Int 
+    points_redeemed Int
+    points_earned Int
+    loyalty_users loyalty_users? @relation(fields: [loyalty_users_id], references: [id])
+    store_id Int 
+    store stores? @relation(fields: [store_id], references: [id])
+}
+
+enum enum_payment_method {
+    cash
+    card
+    online
 }

@@ -40,7 +40,12 @@ const TriggerCard = (data: ITriggerType) => {
         <h1 className="text-lg font-semibold">
           {data.coupon_occassions?.name}
         </h1>
-        <p className="text-sm text-gray-500">Get {data.points} points</p>
+        <p className="text-sm text-gray-500">
+          Get {data.points} points{" "}
+          {data.coupon_occassions_id === 2
+            ? `for ${data.store_orders_coupons[0]?.rupees || 0} rupees purchase`
+            : ""}{" "}
+        </p>
         <p className="text-sm text-gray-500">
           Expiry:{" "}
           <span className="font-semibold">

@@ -1,6 +1,9 @@
 import AdminLayout from "@/layouts/admin";
+import { api } from "@/utils/api";
 import { Table } from "antd";
+import { useState } from "react";
 import MetricsCard, { MetricsCardProps } from "../dashboard/MetricsCard";
+import AddBillDrawer from "./AddBillDrawer";
 import Header from "./Header";
 
 const DummyMetricsCards: MetricsCardProps[] = [
@@ -100,13 +103,13 @@ const billsData = [
 const columns = [
   {
     title: "Bill Number",
-    dataIndex: "billNumber",
-    key: "billNumber",
+    dataIndex: "id",
+    key: "id",
   },
   {
     title: "Bill Date",
-    dataIndex: "billDate",
-    key: "billDate",
+    dataIndex: "created_at",
+    key: "created_at",
   },
   {
     title: "Customer Name",
@@ -115,32 +118,39 @@ const columns = [
   },
   {
     title: "Total Products",
-    dataIndex: "totalProducts",
-    key: "totalProducts",
+    dataIndex: "number_of_items",
+    key: "number_of_items",
   },
   {
     title: "Total Amount",
-    dataIndex: "totalAmount",
-    key: "totalAmount",
+    dataIndex: "bill_amount",
+    key: "bill_amount",
   },
   {
-    title: "Status",
-    dataIndex: "status",
-    key: "status",
+    title: "Discounted Amount",
+    dataIndex: "discounted_amount",
+    key: "discounted_amount",
   },
   {
-    title: "Payment Mode",
-    dataIndex: "paymentMode",
-    key: "paymentMode",
+    title: "Payment Method",
+    dataIndex: "payment_method",
+    key: "payment_method",
   },
   {
-    title: "Created At",
-    dataIndex: "createdAt",
-    key: "createdAt",
+    title: "Points Redeemed",
+    dataIndex: "points_redeemed",
+    key: "points_redeemed",
+  },
+  {
+    title: "Points Earned",
+    dataIndex: "points_earned",
+    key: "points_earned",
   },
 ];
 
 const BillingContainer = () => {
+  const { data, isLoading } = api.bills.getAllBills.useQuery();
+
   return (
     <AdminLayout page="Billing">
       <div className="flex w-full flex-col gap-6 px-6 py-8">
@@ -151,11 +161,12 @@ const BillingContainer = () => {
         </div>
         <Header />
         <Table
-          dataSource={billsData}
+          dataSource={data}
           columns={columns}
           pagination={{ pageSize: 5 }}
         />
       </div>
+      <AddBillDrawer />
     </AdminLayout>
   );
 };
