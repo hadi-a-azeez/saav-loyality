@@ -10,16 +10,27 @@ export const billsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      const user = await prisma.user_points.findFirst({
+      // sum of all points earned by user subtracted by points redeemed
+      const pointsHistory = await prisma.points_history.groupBy({
+        by: ["loyalty_users_id", "transaction_type"],
         where: {
-          id: input.user_id,
+          loyalty_users_id: input.user_id,
           store_id: ctx.user,
         },
+        _sum: {
+          points: true,
+        },
       });
-      let points = 0;
-      if (!user) return points;
-      else points = user.points;
-      return points;
+
+      const totalPoints = pointsHistory.reduce((total, item) => {
+        if (item.transaction_type === "earned") {
+          return total + (item._sum.points || 0);
+        } else {
+          return total - (item._sum.points || 0);
+        }
+      }, 0);
+
+      return totalPoints;
     }),
   getStorePointsSystem: privateProcedure.query(async ({ ctx }) => {
     const pointsSystem = await prisma.store_points_system.findUnique({

@@ -1,10 +1,12 @@
 import AdminLayout from "@/layouts/admin";
-import { api } from "@/utils/api";
+import { RouterOutputs, api } from "@/utils/api";
 import { Table } from "antd";
 import { useState } from "react";
 import MetricsCard, { MetricsCardProps } from "../dashboard/MetricsCard";
 import AddBillDrawer from "./AddBillDrawer";
 import Header from "./Header";
+
+type IBillRecord = RouterOutputs["bills"]["getAllBills"][0];
 
 const DummyMetricsCards: MetricsCardProps[] = [
   {
@@ -37,69 +39,6 @@ const DummyMetricsCards: MetricsCardProps[] = [
   },
 ];
 
-const billsData = [
-  {
-    id: 1,
-    billNumber: "B-0001",
-    billDate: "2021-01-01",
-    customerName: "John Doe",
-    totalProducts: 3,
-    totalAmount: 100,
-    status: "paid",
-    createdAt: "2021-01-01",
-    updatedAt: "2021-01-01",
-    paymentMode: "cash",
-  },
-  {
-    id: 2,
-    billNumber: "B-0001",
-    billDate: "2021-01-01",
-    customerName: "John Doe",
-    totalProducts: 3,
-    totalAmount: 100,
-    status: "paid",
-    createdAt: "2021-01-01",
-    updatedAt: "2021-01-01",
-    paymentMode: "cash",
-  },
-  {
-    id: 3,
-    billNumber: "B-0001",
-    billDate: "2021-01-01",
-    totalProducts: 3,
-    customerName: "John Doe",
-    totalAmount: 100,
-    status: "paid",
-    createdAt: "2021-01-01",
-    updatedAt: "2021-01-01",
-    paymentMode: "cash",
-  },
-  {
-    id: 4,
-    billNumber: "B-0001",
-    billDate: "2021-01-01",
-    customerName: "John Doe",
-    totalProducts: 3,
-    totalAmount: 100,
-    status: "paid",
-    createdAt: "2021-01-01",
-    updatedAt: "2021-01-01",
-    paymentMode: "cash",
-  },
-  {
-    id: 5,
-    billNumber: "B-0001",
-    billDate: "2021-01-01",
-    customerName: "John Doe",
-    totalProducts: 3,
-    totalAmount: 100,
-    status: "paid",
-    createdAt: "2021-01-01",
-    updatedAt: "2021-01-01",
-    paymentMode: "cash",
-  },
-];
-
 const columns = [
   {
     title: "Bill Number",
@@ -108,13 +47,19 @@ const columns = [
   },
   {
     title: "Bill Date",
-    dataIndex: "created_at",
-    key: "created_at",
+    dataIndex: "bill_date",
+    key: "bill_date",
+    render: (_: any, record: IBillRecord) => (
+      <span>{new Date(record.bill_date).toLocaleDateString()}</span>
+    ),
   },
   {
     title: "Customer Name",
     dataIndex: "customerName",
     key: "customerName",
+    render: (_: any, record: IBillRecord) => (
+      <span>{record.loyalty_users?.name}</span>
+    ),
   },
   {
     title: "Total Products",

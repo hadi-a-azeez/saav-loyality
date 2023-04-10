@@ -1,6 +1,8 @@
 import { billsRouter } from "./routers/bills.router";
 import { couponsRouter } from "./routers/coupons.router";
 import { customersRouter } from "./routers/customers.router";
+import { reviewsRouter } from "./routers/reviews.router";
+import { storeRouter } from "./routers/store.router";
 import { storesRouter } from "./routers/stores.router";
 import { userRouter } from "./routers/user.router";
 import { walkoutsRouter } from "./routers/walkouts.router";
@@ -18,6 +20,8 @@ export const appRouter = createTRPCRouter({
   customers: customersRouter,
   walkouts: walkoutsRouter,
   bills: billsRouter,
+  reviews: reviewsRouter,
+  store: storeRouter,
 });
 
 // export type definition of API

@@ -54,6 +54,9 @@ const AddBillDrawer = () => {
     }
   );
   const { data: Triggers } = api.coupons.getAllCoupons.useQuery();
+  const addToHistoryMutation = api.bills.addToPointsHistory.useMutation();
+  const addBillMutation = api.bills.addToBills.useMutation();
+  const addPointsMutation = api.bills.addToUserPoints.useMutation();
 
   useEffect(() => {
     // points can only apply if the total amount is greater than the minimum order amount
@@ -102,15 +105,79 @@ const AddBillDrawer = () => {
     return customer;
   };
 
-  const handleAddBill = async (values: FormValues) => {
+  const handleAddBill = (values: FormValues) => {
     // check if store has points on order trigger
     // if yes, add the bill with the points
     // if no, add the bill without the points
     const trigger = Triggers?.find(
       (trigger) => trigger.coupon_occassions_id === 2
     );
-    if (trigger) {
+    const discounted_amount =
+      Number(totalAmount) -
+      (Number(points) / Number(storePointsSystem?.points)) *
+        (storePointsSystem?.rupees || 0);
+    if (
+      trigger &&
+      Number(totalAmount) >= Number(storePointsSystem?.minimum_order_amount)
+    ) {
+      // finding how much points the user can earn
+      const order_amount = trigger.store_orders_coupons[0]?.rupees || 0;
+      const points_for_order = trigger.store_orders_coupons[0]?.points || 0;
+      const points_earned =
+        Math.floor(Number(discounted_amount) / order_amount) * points_for_order;
+      addBillMutation.mutate(
+        {
+          user_id: Number(selectedCustomer),
+          bill_amount: Number(values.total_amount),
+          number_of_items: Number(values.number_of_items),
+          bill_date: new Date().toISOString(),
+          discounted_amount: discounted_amount,
+          payment_method: "cash",
+          points_earned: points_earned,
+          points_redeemed: Number(points),
+        },
+        {
+          onSuccess: () => {
+            addToHistoryMutation.mutate({
+              user_id: Number(selectedCustomer),
+              points: Number(points),
+              transaction_type: "redeemed",
+              occassions_id: 2,
+            });
+            addToHistoryMutation.mutate({
+              user_id: Number(selectedCustomer),
+              points: points_earned,
+              transaction_type: "earned",
+              occassions_id: 2,
+            });
+            setAddBillingDrawerVisible(false);
+          },
+        }
+      );
     } else {
+      addBillMutation.mutate(
+        {
+          user_id: Number(selectedCustomer),
+          bill_amount: Number(values.total_amount),
+          number_of_items: Number(values.number_of_items),
+          bill_date: new Date().toISOString(),
+          discounted_amount: discounted_amount,
+          payment_method: "cash",
+          points_earned: 0,
+          points_redeemed: Number(points),
+        },
+        {
+          onSuccess: () => {
+            addToHistoryMutation.mutate({
+              user_id: Number(selectedCustomer),
+              points: Number(points),
+              transaction_type: "redeemed",
+              occassions_id: 2,
+            });
+            setAddBillingDrawerVisible(false);
+          },
+        }
+      );
     }
   };
 
@@ -173,7 +240,7 @@ const AddBillDrawer = () => {
       <Form
         name="basic"
         layout="vertical"
-        onFinish={(values) => handleAddBill(values)}
+        onFinish={(values: FormValues) => handleAddBill(values)}
       >
         {selectedCustomer === 0 ? (
           <Form.Item
@@ -267,13 +334,22 @@ const AddBillDrawer = () => {
           />
         )}
 
-        {errorMessage && (
-          <Alert description={errorMessage} type="error" closable />
-        )}
-        {pointsError && (
-          <Alert description={pointsError} type="error" closable />
-        )}
-        <Button htmlType="submit" size="large" className="mt-4">
+        {selectedCustomer
+          ? errorMessage && (
+              <Alert description={errorMessage} type="error" closable />
+            )
+          : ""}
+        {selectedCustomer
+          ? pointsError && (
+              <Alert description={pointsError} type="error" closable />
+            )
+          : ""}
+        <Button
+          htmlType="submit"
+          size="large"
+          className="mt-4"
+          loading={addPointsMutation.isLoading || addBillMutation.isLoading}
+        >
           Redeem Points
         </Button>
       </Form>
